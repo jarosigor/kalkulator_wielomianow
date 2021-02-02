@@ -1,30 +1,29 @@
 
 #include "calc.h"
 
-#define waves for (int i = 0; i < 50; i++) printf("~");
-#define newline printf("\n");
-#define wave newline waves newline
-#define S sizeof(char)*200
-#define I sizeof(int)
+
+
+
+
 
 // helper function converting string into integer
 int scanNum (char* p1) {
     int tmp = 0, m = 0;
 
     if(*p1 == '-') {
-      m = 1;
-      *p1++;
+        m = 1;
+        *p1++;
     }
 
     if(*p1 == '+') 
-      *p1++;
+        *p1++;
+
+    if (*p1 == 'x')
+        return m ? -1 : 1;
 
     while (isdigit(*p1)) {
         tmp = 10 * tmp + (*p1++) - '0';
     }
-
-    if(m && tmp == 0)
-        return -1;
     
     return m ? -tmp : tmp;
 }
@@ -43,37 +42,52 @@ void processIn(char *p, int *processedPolynPower, int *processedPolynNum) {
         }
             
         if (*p == 'x') {
-            if (num == 0) 
-                *processedPolynNum = 1;
-            else 
+            if (num != 0) {
                 *processedPolynNum = num;
+                *processedPolynNum++;
+                
+                //printf("%d", num);
+                numhelp = true;
 
-            *processedPolynNum++;
-            
-            //printf("%d", num);
-            numhelp = true;
-
-            *p++;
-            if (*p == '^') {
                 *p++;
-                power = scanNum(p);
-                //printf("%d", power);
-                if (power == 0 || power == -1) {
-                    printf("Błędne wejście!");
-                    return;
+                if (*p == '^') {
+                    *p++;
+                    power = scanNum(p);
+                    //printf("%d", power);
+                    if (power == -1) {
+                        printf("Błędne wejście!");
+                        return;
+                    }
+                        
+                    else {
+                        *processedPolynPower = power;
+                        *processedPolynPower++;
+                    }
                 }
-                    
+
                 else {
-                    *processedPolynPower = power;
+                    *processedPolynPower = 1;
                     *processedPolynPower++;
                 }
-            }
 
+            }
             else {
-                *processedPolynPower = 1;
-                *processedPolynPower++;
+                *p++;
+                if (*p == '^'){
+                    *p++;
+                    numhelp=true;
+                }
+                else {
+                    *processedPolynNum = num;
+                    *processedPolynPower = 1;
+                    *p++;
+                    *processedPolynPower++;
+                    *processedPolynNum++;
+                    numhelp = true;
+                }
             }
-
+                
+                
         }
         else *p++;
 
@@ -84,12 +98,8 @@ void processIn(char *p, int *processedPolynPower, int *processedPolynNum) {
 
         if (*p == '+' || *p == '-')
             numO = true;
-
-        
-
         
     }
-
     
     
 }
@@ -118,10 +128,19 @@ void calculator() {
     int *polyn1Power, *polyn1Num, *polyn2Power, *polyn2Num;
     polyn1 = (char*) malloc(S);
     polyn2 = (char*) malloc(S);
-    polyn1Power = (int*) malloc(*degree1 * I);
-    polyn1Num = (int*) malloc(*degree1 * I);
-    polyn2Power = (int*) malloc(*degree2 * I);
-    polyn2Num = (int*) malloc(*degree2 * I);
+    polyn1Power = (int*) calloc(*degree1 + 2, I);
+    polyn1Num = (int*) calloc(*degree1 + 2, I);
+    polyn2Power = (int*) calloc(*degree2 + 2, I);
+    polyn2Num = (int*) calloc(*degree2 + 2, I);
+
+    //processed polynomials
+    Polynomial pol1, pol2;
+    pol1.polynNum = polyn1Num;
+    pol1.polynPower = polyn1Power;
+    pol2.polynNum = polyn2Num;
+    pol2.polynPower = polyn2Power;
+
+    //print_polynomial(pol1);
 
     if (polyn1 == NULL) {
         printf("Przydzielenie pamięci nie było możliwe (wejście / 1 wielomian)");
@@ -147,6 +166,7 @@ void calculator() {
 
     processIn(polyn1, polyn1Power, polyn1Num);
     processIn(polyn2, polyn2Power, polyn2Num);
+
     /*
     for (int i=0; i <= sizeof(polyn1Power)/sizeof(polyn1Power[0]); i++) {
         printf("%d\n", polyn1Num[i]);
@@ -166,26 +186,32 @@ void calculator() {
     newline
     printf("1 -> Dodaj");
     newline
+    printf("2 -> Odejmij");
+    newline
     printf("3 -> Wymnóż");
     newline
     printf("4 -> Podziel z resztą");
     newline
     printf("5 -> Składanie wielomianów");
+    newline
+    printf("6 -> Wyjście");
     wave
     
     scanf("%d", calc_choice);
     waves
     newline
     if (*calc_choice == 1) 
-        add(polyn1Power, polyn1Num, polyn2Power, polyn2Num);
+        print_polynomial(add(pol1, pol2));
     else if (*calc_choice == 2)
-        substract(polyn1Power, polyn1Num, polyn2Power, polyn2Num);
+        print_polynomial(substract(pol1, pol2));
     else if (*calc_choice == 3)
-        multiply(polyn1Power, polyn1Num, polyn2Power, polyn2Num);
+        print_polynomial(multiply(pol1, pol2));
     else if (*calc_choice == 4)
-        divide(polyn1Power, polyn1Num, polyn2Power, polyn2Num);
+        print_polynomial(divide(pol1, pol2));
     else if (*calc_choice == 5)
-        combine(polyn1Power, polyn1Num, polyn2Power, polyn2Num);
+        print_polynomial(combine(pol1, pol2));
+    else if (*calc_choice == 6)
+        exit(0);
     else {
         wave
         printf("!!!Błędne wejście podaj numer operacji jeszcze raz!!!");
