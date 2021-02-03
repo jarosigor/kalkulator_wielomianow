@@ -10,7 +10,7 @@
 #define S sizeof(char)*200
 #define I sizeof(int)
 
-//structure keeping pointers to arrays with power and number of polynomial
+//structure representing polynomial, keeping pointers to arrays with power and number of polynomial
 typedef struct {
     int *polynPower;
     int *polynNum;
@@ -20,7 +20,16 @@ void swap(int* a, int* b) {
     int t = *a;  
     *a = *b;  
     *b = t;  
-} 
+}
+
+int get_power (int x, int power) {
+    int result = x;
+    if (power == 0)
+        return 1;
+    for(int i = 1; i < power; i++) 
+        result *= x;
+    return result;
+}
 
 void bubblesort(int *power, int *number, int arr_size) 
 { 
@@ -32,6 +41,7 @@ void bubblesort(int *power, int *number, int arr_size)
             }
 
 } 
+
 int binarySearch(int array[], int left, int right, int searched_val){
     if (left <= right) {
         int mid = left + (right-left) / 2;
@@ -46,7 +56,21 @@ int binarySearch(int array[], int left, int right, int searched_val){
 
     return -1;
 
-} 
+}
+
+int calculate_polynomial(Polynomial f, int x) {
+    int *fnum = f.polynNum, *fpow = f.polynPower;
+    int i = 0;
+    double result = 0;
+    
+    while (fnum[i] !=0 || fpow[i] != 0) {
+        result += get_power(x, fpow[i]) * fnum[i];
+        i++;
+    } 
+        
+
+    return result;
+}
 
 void print_polynomial(Polynomial f) {
     int *fnum = f.polynNum, *fpow = f.polynPower;
@@ -121,10 +145,7 @@ Polynomial add(Polynomial f, Polynomial g) {
     return result;
 }
 
-//-7x^5+2x^3-9x^2+10x
-//5x^5-4x^3+5x^2-x
 
-//function that substracts 2 polynomials and prints the result
 Polynomial substract(Polynomial f, Polynomial g) {
     Polynomial result;
     int *resPower, *resNum;
@@ -170,7 +191,7 @@ Polynomial substract(Polynomial f, Polynomial g) {
 
 }
 
-//function that multplies 2 polynomials and prints the result 
+ 
 Polynomial multiply(Polynomial f, Polynomial g) {
     Polynomial result;
     int *resPower, *resNum;
@@ -210,15 +231,16 @@ Polynomial multiply(Polynomial f, Polynomial g) {
     return result;
 }
 
-//function that divides 2 polynomials and prints the result and the reminder
-Polynomial divide(Polynomial f, Polynomial g) {
 
+Polynomial divide(Polynomial f, Polynomial g) {
+    printf("Divide function is in progress\n");
+    exit(0);
 
 }
 
-//function that combines 2 polynomials and prints the result
 Polynomial combine(Polynomial f, Polynomial g) {
-
+    printf("Combine function is in progress\n");
+    exit(0);
 
 }
 

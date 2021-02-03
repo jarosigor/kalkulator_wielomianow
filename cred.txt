@@ -1,0 +1,7 @@
+Author: Igor Jarosz
+Student index number: 324608
+Project title: Polynomials calculator in C
+
+Kalkulator umożliwiający obliczanie wartości, 
+dodawanie, odejmowanie, mnożenie wielomianów, oraz
+zapamiętywanie ich, napisany w języku C.

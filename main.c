@@ -4,13 +4,12 @@
 Igor Jarosz
 Student index number: 324608
 Project: Polynomials calculator in C
-Enables user to add, substract, multiply, divide 2 polynomials,
-get the reminder of polynomial division and also combine those polynomials
+Enables user to add, substract, multiply, those polynomials
 */
 
 void menu() {
     
-    int *menu_choice;// variable storing users choice in main menu
+    int *menu_choice;
     menu_choice = (int*) malloc(I);
     if (menu_choice == NULL) {
         printf("Przydzielenie pamięci nie było możliwe (menu / choice)");
@@ -30,12 +29,14 @@ void menu() {
     wave
     
     scanf("%d", menu_choice);
+    waves
+    newline
     if (*menu_choice == 1) 
         calculator();
     else if (*menu_choice == 2)
-        help();
+        help("help.txt");
     else if (*menu_choice == 3)
-        info();
+        info("cred.txt");
     else if (*menu_choice == 4)
         exit(0);
     else {

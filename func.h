@@ -1,9 +1,7 @@
 
 #include "calc.h"
 
-
-
-
+#define FILENAME "baza_wielomianow.txt"
 
 
 // helper function converting string into integer
@@ -28,8 +26,20 @@ int scanNum (char* p1) {
     return m ? -tmp : tmp;
 }
 
-// function processing polynomial
-void processIn(char *p, int *processedPolynPower, int *processedPolynNum) {
+/*bool is_proper(char *polynomial) {
+    int i = 0, len = strlen(polynomial);
+
+    for(int i = 0; i < len; i++) {
+        if (isdigit(polynomial[i]) != 0 || polynomial[i] == '-' || polynomial[i] == '+' || polynomial[i] == 'x' || polynomial[i] == '^');
+        else 
+            return false;
+    }
+
+    return true;
+}
+*/
+
+void processPolynomial(char *p, int *processedPolynPower, int *processedPolynNum) {
     int num = 0, power = 0;
     bool numO = true, numhelp = false;
     
@@ -46,14 +56,14 @@ void processIn(char *p, int *processedPolynPower, int *processedPolynNum) {
                 *processedPolynNum = num;
                 *processedPolynNum++;
                 
-                //printf("%d", num);
+                
                 numhelp = true;
 
                 *p++;
                 if (*p == '^') {
                     *p++;
                     power = scanNum(p);
-                    //printf("%d", power);
+
                     if (power == -1) {
                         printf("Błędne wejście!");
                         return;
@@ -104,34 +114,70 @@ void processIn(char *p, int *processedPolynPower, int *processedPolynNum) {
     
 }
 
+bool print_database(const char *file_name) {
+    FILE *database;
+    database = fopen(file_name, "r");
+    
+    if (database == NULL) {
+        printf("Baza wielomianów jest pusta");
+        return false;
+    }
+
+    char line[400];
+    int count = 1;
+
+    while (fgets(line, sizeof(line), database)) {
+        printf("%d. %s", count, line);
+        count++;
+    }
+
+    fclose(database);
+    return true;
+
+}
+
+void add_to_database(char *polynomial, const char *file_name) {
+    FILE *database;
+    database = fopen(file_name, "a");
+
+    fprintf(database, "%s\n", polynomial);
+
+    fclose(database);
+}
+
+char *get_polynomial_database (int number, const char *file_name) {
+    FILE *database;
+    database = fopen(file_name, "r");
+
+    static char line[400];
+    int count = 1;
+    static char *result;
+
+    while (fgets(line, sizeof(line), database)) {
+        if (count == number) {
+            break;
+        }
+        count++;
+    }
+
+    fclose(database);
+    return line;
+    
+    
+}
+
 
 
 // calculator function where user types in polynomials then
 // chooses what he/she wants to calculate and gets the result
 void calculator() {
-    
-    
-    int *degree1, *degree2;
-    degree1 = (int*) malloc(I);
-    degree2 = (int*) malloc(I);
-    waves
-    newline
-    printf("Podaj stopień 1 wielomianu");
-    newline
-    scanf("%d", degree1);
-    printf("Podaj stopień 2 wielomianu");
-    newline
-    scanf("%d", degree2);
-    
     // strings with the polynomials from input
-    char *polyn1, *polyn2;
-    int *polyn1Power, *polyn1Num, *polyn2Power, *polyn2Num;
-    polyn1 = (char*) malloc(S);
-    polyn2 = (char*) malloc(S);
-    polyn1Power = (int*) calloc(*degree1 + 2, I);
-    polyn1Num = (int*) calloc(*degree1 + 2, I);
-    polyn2Power = (int*) calloc(*degree2 + 2, I);
-    polyn2Num = (int*) calloc(*degree2 + 2, I);
+    char *polyn1 = (char*) malloc(S);
+    char *polyn2 = (char*) malloc(S);
+    int *polyn1Power = (int*) calloc(400, I);
+    int *polyn1Num = (int*) calloc(400, I);
+    int *polyn2Power = (int*) calloc(400, I);
+    int *polyn2Num = (int*) calloc(400, I);
 
     //processed polynomials
     Polynomial pol1, pol2;
@@ -140,41 +186,104 @@ void calculator() {
     pol2.polynNum = polyn2Num;
     pol2.polynPower = polyn2Power;
 
-    //print_polynomial(pol1);
-
-    if (polyn1 == NULL) {
-        printf("Przydzielenie pamięci nie było możliwe (wejście / 1 wielomian)");
-        exit(0);
-    }
-    if (polyn2 == NULL) {
-        printf("Przydzielenie pamięci nie było możliwe (wejście / 2 wielomian)");
-        exit(0);
-    }
-
-    waves
+    bool input_from_data_base = false;
+    int input_choice;
+    printf("Pierwszy wielomian:");
     newline
-    printf("Podaj pierwszy wielomian");
-    wave
-    scanf("%s", polyn1);
-    waves
+    printf("Czy chcesz wybrać zapisany wielomian? (1 -> tak / 2 -> nie)");
     newline
-    printf("Podaj drugi wielomian");
-    wave
-    scanf("%s", polyn2);
-    waves
-    newline
+    scanf("%d", &input_choice);
 
-    processIn(polyn1, polyn1Power, polyn1Num);
-    processIn(polyn2, polyn2Power, polyn2Num);
-
-    /*
-    for (int i=0; i <= sizeof(polyn1Power)/sizeof(polyn1Power[0]); i++) {
-        printf("%d\n", polyn1Num[i]);
+    if (input_choice == 1)
+        input_from_data_base = true;
+    else if (input_choice != 2) {
+        printf("Błędne wejście!");
+        wave
+        calculator();
     }
-    */
-  
 
-    int* calc_choice; // variable storing users choice in calculator menu
+    if (!input_from_data_base) {
+        waves
+        newline
+        printf("Podaj wielomian");
+        wave
+        scanf("%s", polyn1);
+
+        waves
+        newline
+        int saving_choice = 0;
+        printf("Czy chcesz zapisać podany wielomian? (1 -> tak / 2 -> nie)");
+        newline
+        scanf("%d", &saving_choice);
+        if (saving_choice == 1)
+            add_to_database(polyn1, FILENAME);
+        wave
+
+    }
+    else {
+        int polynomial_choice = 0;
+        wave
+        print_database(FILENAME);
+        wave
+        printf("Podaj numer wielomianu");
+        wave
+        scanf("%d", &polynomial_choice);
+        strcpy(polyn1, get_polynomial_database(polynomial_choice, FILENAME));
+        printf("Wybrany wielomian: %s", polyn1);
+        wave
+    }
+
+    input_from_data_base = false;
+    printf("Drugi wielomian:");
+    newline
+    printf("Czy chcesz wybrać zapisany wielomian? (1 -> tak / 2 -> nie)");
+    newline
+    scanf("%d", &input_choice);
+
+    if (input_choice == 1)
+        input_from_data_base = true;
+    else if (input_choice != 2) {
+        printf("Błędne wejście!");
+        wave
+        calculator();
+    }
+
+    if (!input_from_data_base) {
+        waves
+        newline
+        printf("Podaj wielomian");
+        wave
+        scanf("%s", polyn2);
+        waves
+        newline
+        int saving_choice = 0;
+        printf("Czy chcesz zapisać podany wielomian? (1 -> tak / 2 -> nie)");
+        scanf("%d", &saving_choice);
+        if (saving_choice == 1)
+            add_to_database(polyn2, FILENAME);
+        wave
+        
+    }
+    else {
+        int polynomial_choice = 0;
+        wave
+        print_database(FILENAME);
+        wave
+        printf("Podaj numer wielomianu");
+        wave
+        scanf("%d", &polynomial_choice);
+        strcpy(polyn2, get_polynomial_database(polynomial_choice, FILENAME));
+        printf("Wybrany wielomian: %s", polyn2);
+        wave
+    }
+
+    
+
+    processPolynomial(polyn1, polyn1Power, polyn1Num);
+    processPolynomial(polyn2, polyn2Power, polyn2Num);
+
+
+    int* calc_choice; 
     calc_choice = (int*) malloc(I);
     if (calc_choice == NULL) {
         printf("Przydzielenie pamięci nie było możliwe (calculator / calc_choice)");
@@ -184,33 +293,54 @@ void calculator() {
     //options 1 - add / 2 - substract / 3 - multiply / 4 - divide and get division reminder / 5 - combine 
     printf("Operacje");
     newline
-    printf("1 -> Dodaj");
+    printf("1 -> Oblicz wartość 1 wielomianu");
     newline
-    printf("2 -> Odejmij");
+    printf("2 -> Oblicz wartość 2 wielomianu");
     newline
-    printf("3 -> Wymnóż");
+    printf("3 -> Dodaj");
     newline
-    printf("4 -> Podziel z resztą");
+    printf("4 -> Odejmij");
     newline
-    printf("5 -> Składanie wielomianów");
+    printf("5 -> Wymnóż");
     newline
-    printf("6 -> Wyjście");
+    printf("6 -> Podziel z resztą");
+    newline
+    printf("7 -> Składanie wielomianów");
+    newline
+    printf("8 -> Wyjście");
     wave
     
     scanf("%d", calc_choice);
     waves
     newline
-    if (*calc_choice == 1) 
+
+    printf("\nWynik\n");
+
+    if (*calc_choice == 1) {
+        int x;
+        printf("Podaj wartość x:");
+        scanf("%d", &x);
+        printf("f(%d) = %d", x, calculate_polynomial(pol1, x));
+        wave
+    }
+    else if (*calc_choice == 2) {
+        int x;
+        printf("Podaj wartość x:");
+        scanf("%d", &x);
+        printf("g(%d) = %d", x, calculate_polynomial(pol2, x));
+        wave
+    }
+    else if (*calc_choice == 3) 
         print_polynomial(add(pol1, pol2));
-    else if (*calc_choice == 2)
-        print_polynomial(substract(pol1, pol2));
-    else if (*calc_choice == 3)
-        print_polynomial(multiply(pol1, pol2));
     else if (*calc_choice == 4)
-        print_polynomial(divide(pol1, pol2));
+        print_polynomial(substract(pol1, pol2));
     else if (*calc_choice == 5)
-        print_polynomial(combine(pol1, pol2));
+        print_polynomial(multiply(pol1, pol2));
     else if (*calc_choice == 6)
+        print_polynomial(divide(pol1, pol2));
+    else if (*calc_choice == 7)
+        print_polynomial(combine(pol1, pol2));
+    else if (*calc_choice == 8)
         exit(0);
     else {
         wave
@@ -220,9 +350,6 @@ void calculator() {
     }
 
     
-
-    free(degree1);
-    free(degree2);
     free(polyn1);
     free(polyn2);
     free(calc_choice);
@@ -233,16 +360,32 @@ void calculator() {
 }
 
 //opens a file with an instruction manual to the calculator
-void help() {
+void help(const char *help_file) {
+    FILE *in;
+    in = fopen(help_file, "r");
 
+    char line[400];
+    wave
+    while (fgets(line, sizeof(line), in)) {
+        printf("%s", line);
+    }
+    wave
 
-    
+    fclose(in);
 }
 
-//prints informations about the program
-void info() {
+void info(const char *info_file) {
+    FILE *in;
+    in = fopen(info_file, "r");
 
+    char line[400];
+    wave
+    while (fgets(line, sizeof(line), in)) {
+        printf("%s", line);
+    }
+    wave
 
+    fclose(in);
     
 }
 

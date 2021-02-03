@@ -1,0 +1,14 @@
+---Instrukcja---
+Postępuj zgodnie z poleceniami wyświetlanymi w konsoli, przy wyborze opcji
+wpisz tylko numer opcji. Wielomiany muszą być poprawne tzn. kolejne elementy
+muszą być uporządkowane malejąco potęgami, nie mogą zawierać spacji
+i znaków innych niż {x, +, -, ^, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9}.
+Przykładowe poprane wielomiany:
+x^82-3x^9+4x-189
+-x+3
+152
+x^3-11x^2
+-30x^9-x
+Niestety funkcje dzielenia i składania wielomianów nie są obsługiwane.
+
+
